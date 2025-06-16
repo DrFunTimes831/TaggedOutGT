@@ -29,7 +29,7 @@
     const form = document.getElementById("news-form");
     const list = document.getElementById("news-list");
 
-    fetch("news.json")
+    fetch("../../news.json")
       .then(res => res.json())
       .then(data => {
         news = data.news || [];
