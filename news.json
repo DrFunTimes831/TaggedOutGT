@@ -14,6 +14,11 @@
       "title": "Website Launched",
       "date": "2025-06-15",
       "message": "The official TaggedOut website is live!"
+    },
+    {
+      "title": "Website Link Changed",
+      "date":"2025-06-16",
+      "message": "Due to some technical Difficulties on Our Side, we had to change the link from taggedoutgt.netlify.app to taggedoutgt.vercel.app"
     }
   ]
 }
