@@ -3,82 +3,55 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Edit News – TaggedOut</title>
+  <title>Submit News – Admin</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body class="bg-gray-900 text-white font-sans p-6">
+<body class="bg-gray-900 text-white font-sans p-6" x-data="{ success: false }">
+  <h1 class="text-3xl font-bold text-yellow-400 mb-6">📝 Submit News</h1>
 
-  <h1 class="text-3xl font-bold text-yellow-400 mb-4">🛠️ News Editor</h1>
+  <form id="newsForm" class="space-y-4" @submit.prevent="submitForm">
+    <input type="text" name="entry.1840444904" placeholder="Title" required
+           class="w-full p-2 text-black rounded" />
+    <input type="date" name="entry.1099250879" required
+           class="w-full p-2 text-black rounded" />
+    <textarea name="entry.1985029517" placeholder="Message..." required
+              class="w-full p-2 text-black rounded h-24"></textarea>
 
-  <form id="news-form" class="space-y-4">
-    <input type="text" id="title" placeholder="Title" class="w-full p-2 text-black rounded" />
-    <input type="date" id="date" class="w-full p-2 text-black rounded" />
-    <textarea id="message" placeholder="Message..." class="w-full p-2 text-black rounded h-24"></textarea>
-    <button type="submit" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded">➕ Add News</button>
+    <button type="submit"
+            class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded font-semibold">
+      ➕ Submit News
+    </button>
   </form>
 
-  <h2 class="text-xl font-semibold mt-8 mb-2">🗂 News List</h2>
-  <ul id="news-list" class="space-y-2"></ul>
+  <!-- Success Popup -->
+  <div x-show="success" x-transition
+       class="mt-6 bg-green-700 text-white px-4 py-3 rounded shadow-lg">
+    ✅ News submitted successfully!
+  </div>
 
-  <button onclick="downloadJSON()" class="mt-6 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">💾 Save news.json</button>
-  <a href="/index.html" class="ml-4 text-yellow-300 hover:underline">← Return to Home</a>
+  <a href="/news.html" class="text-yellow-300 hover:underline mt-8 block">← Return to News</a>
 
   <script>
-    let news = [];
-
-    const form = document.getElementById("news-form");
-    const list = document.getElementById("news-list");
-
-    fetch("../../news.json")
-      .then(res => res.json())
-      .then(data => {
-        news = data.news || [];
-        render();
+    function submitForm(event) {
+      const form = document.getElementById('newsForm');
+      const data = new FormData(form);
+      fetch("https://docs.google.com/forms/d/e/1FAIpQLSctzTagr3ruxsH6grYhJK9T2gZpiBLVIvXTW7oKRJFGBoYH8Q/formResponse", {
+        method: "POST",
+        mode: "no-cors",
+        body: data
+      }).then(() => {
+        form.reset();
+        document.querySelector('[x-data]').__x.$data.success = true;
       });
+    }
 
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const title = document.getElementById("title").value.trim();
-      const date = document.getElementById("date").value;
-      const message = document.getElementById("message").value.trim();
-
-      if (!title || !date || !message) return alert("Please fill out all fields.");
-      news.push({ title, date, message });
-      form.reset();
-      render();
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('submitForm', () => ({
+        success: false,
+        submitForm
+      }));
     });
-
-    function render() {
-      list.innerHTML = "";
-      news.forEach((n, i) => {
-        const li = document.createElement("li");
-        li.className = "bg-gray-800 px-4 py-2 rounded flex justify-between items-start";
-        li.innerHTML = `
-          <div>
-            <strong class="text-yellow-300">${n.title}</strong><br/>
-            <em class="text-sm text-gray-400">${n.date}</em><br/>
-            <p class="text-sm text-gray-300">${n.message}</p>
-          </div>
-          <button onclick="remove(${i})" class="ml-4 text-red-500 hover:text-red-400">🗑</button>
-        `;
-        list.appendChild(li);
-      });
-    }
-
-    function remove(index) {
-      news.splice(index, 1);
-      render();
-    }
-
-    function downloadJSON() {
-      const blob = new Blob([JSON.stringify({ news }, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "news.json";
-      a.click();
-      URL.revokeObjectURL(url);
-    }
   </script>
 </body>
 </html>
